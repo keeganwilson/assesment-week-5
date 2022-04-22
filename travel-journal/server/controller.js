@@ -23,7 +23,6 @@ module.exports = {
 
     createCity: (req, res) => {
         let {name, rating, countryId} = req.body
-        console.log(req.body)
         sequelize.query(`
             INSERT INTO cities (name, rating, country_id)
             VALUES ('${name}', ${rating}, ${countryId});
@@ -34,19 +33,20 @@ module.exports = {
 
     getCities: (req, res) => {
         sequelize.query(`
-            SELECT * FROM cities city
-            JOIN countries country
-            ON city.country_id = country.country_id
-            ORDER BY rating DESC;
+            SELECT ci.city_id, ci.name AS city, ci.rating, co.country_id, co.name AS country
+            FROM cities ci
+            JOIN countries co
+            ON co.country_id = ci.country_id
+            ORDER BY ci.rating DESC;
         `)
         .then(dbres => res.status(200).send(dbres[0]))
         .catch(err => console.log(err))
     },
 
     deleteCity: (req, res) => {
-        let {cityId} = req.params
+        let {id} = req.params
         sequelize.query(`
-            DELETE FROM cities WHERE city_id=${cityId};
+            DELETE FROM cities WHERE city_id=${id};
         `)
         .then(dbres => res.status(200).send(dbres[0]))
         .catch(err => console.log(err))
